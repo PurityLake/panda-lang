@@ -1,2 +1,2 @@
-let x = 20;
-let y = 10] + x;
+let x = 42;
+let y = 10 + x;

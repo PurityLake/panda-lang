@@ -24,7 +24,7 @@ let () =
       let l = ref 1 in
       while true; do
           let line = input_line ic in
-          let tokens = tokenize line l in
+          let tokens = tokenize line !l in
           Rezit.Parser.parse (collect tokens line !file_name);
           print_endline "";
           l := !l + 1

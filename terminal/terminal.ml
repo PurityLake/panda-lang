@@ -43,3 +43,7 @@ let reversed = "[7m"
 
 let print_style style =
   Printf.printf "%c%s" escape style
+
+let print_styles styles =
+  let _ = List.map print_style styles in
+  Printf.printf ""

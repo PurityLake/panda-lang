@@ -2,18 +2,21 @@ open Tokenizer
 open Printf
 open Terminal
 
+(* Invalid_statement takes a tuple of an error message and the index
+    of the offender in the token list *)
 exception Invalid_statement of string * int
 exception End
 
+(* Simply prints out an error message  *)
 let stack_trace token_line e idx =
   let token = List.nth token_line.tokens idx in
   let col = token.col - 1 in
   print_endline "";
-  print_style bold;
-  print_style yellow;
+  print_styles [bold; magenta];
   printf "%s:\nError on line %d col %d\n" token_line.filename token.lineno token.col;
   print_style reset;
   printf "%s\n" token_line.line;
+  (* fill up empty space to position the ^ characters correctly *)
   for _ = 0 to col do
     printf " "
   done;
@@ -21,11 +24,13 @@ let stack_trace token_line e idx =
   for _ = 1 to String.length token.s do
     printf "^"
   done;
-  print_style magenta;
+  print_style yellow;
   printf " %s\n" e;
   print_style reset
 
-let rhs token_line i =
+(* rhs - right hand side - matches expression that occur on the right side
+    of an equals sign*)
+let rec rhs token_line i =
   let idx = ref 0 in
   let parens = ref 0 in
   let square_parens = ref 0 in
@@ -62,11 +67,13 @@ let rhs token_line i =
             raise (Invalid_statement("Mismatched '}'", i + !idx))
           else
             curly_parens := !curly_parens - 1
+        | "=" -> 
+          raise (Invalid_statement("'=' is not a valid character in an rhs expresion", i + !idx))
         | _ -> printf "Op: %s\n" op
       end 
       | PString(s)   -> printf "String \"%s\"\n" s
       | Atom(a)      -> printf "Atom %s\n" a
-      | Keyword(_)   -> raise (Invalid_statement("Can't assign a keyword to a variable", i))
+      | Keyword(k)   -> raise (Invalid_statement("Can't assign a keyword to a variable", i))
       | _            -> printf "" 
       in
       idx := !idx + 1
@@ -74,7 +81,7 @@ let rhs token_line i =
   with
     End -> printf ""
 
-let letstatement token_line i =
+let let_statement token_line i =
   printf "let statement\n";
   let _ = 
     match (List.nth token_line.tokens (i + 1)).ttype with
@@ -97,7 +104,7 @@ let keyword token_line i key =
 let expr token_line i =
   printf "expression\n";
   if keyword token_line.tokens i "let" then
-    letstatement token_line i
+    let_statement token_line i
   else
     print_endline "nope"
 
