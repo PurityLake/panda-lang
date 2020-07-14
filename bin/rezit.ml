@@ -1,4 +1,4 @@
-open Panda.Tokenizer
+open Rezit.Tokenizer
 
 let parse_string = ref ""
 let file_name = ref ""
@@ -17,7 +17,7 @@ let () =
     usage;
   if String.length !parse_string > 0 then begin
     let line = collect (tokenize !parse_string 1) !parse_string "<stdin>" in
-    Panda.Parser.parse line
+    Rezit.Parser.parse line
   end else if String.length !file_name > 0 then begin
     let ic = open_in !file_name in
     try
@@ -25,7 +25,7 @@ let () =
       while true; do
           let line = input_line ic in
           let tokens = tokenize line l in
-          Panda.Parser.parse (collect tokens line !file_name);
+          Rezit.Parser.parse (collect tokens line !file_name);
           print_endline "";
           l := !l + 1
       done;

@@ -1,7 +1,7 @@
 (executable
-    (name panda)
-    (libraries panda))
+    (name rezit)
+    (libraries rezit))
 
 (install
     (section bin)
-    (files (panda.exe as panda)))
+    (files (rezit.exe as rezit)))

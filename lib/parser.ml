@@ -7,27 +7,65 @@ exception End
 let stack_trace token_line e idx =
   let token = List.nth token_line.tokens idx in
   let col = token.col - 1 in
-  printf "%s:\nError on line %d col %d\n" token_line.filename token.lineno token.col;
+  print_endline "";
+  printf "%c[1m%c[33m%s:\nError on line %d col %d%c[0m\n" (Char.chr 0x001b)
+    (Char.chr 0x001b)  token_line.filename token.lineno token.col (Char.chr 0x001b);
   printf "%s\n" token_line.line;
   for _ = 0 to col do
     printf " "
   done;
+  printf "%c[31;1m" (Char.chr 0x001b);
   for _ = 1 to String.length token.s do
     printf "^"
   done;
-  printf " ";
-  print_endline e
+  printf "%c[33m " (Char.chr 0x001b);
+  print_endline e;
+  printf "%c[0m" (Char.chr 0x001b)
 
 let rhs token_line i =
   let idx = ref 0 in
+  let parens = ref 0 in
+  let square_parens = ref 0 in
+  let curly_parens = ref 0 in
   try
     while true; do
       let _ = match (List.nth token_line.tokens (i + !idx)).ttype with
-      | Operator(op) -> if op = ";" then raise (End) else printf "Op: %s\n" op
+      | Operator(op) -> begin
+        match op with 
+        | ";" ->
+          if !parens > 0 then
+            raise (Invalid_statement("Mismatched ')'", i + !idx))
+          else if !square_parens > 0 then
+            raise (Invalid_statement("Mismatched ']'", i + !idx))
+          else if !curly_parens > 0 then
+            raise (Invalid_statement("Mismatched '}", i + !idx))
+          else
+            raise (End)
+        | "(" -> parens := !parens + 1
+        | ")" ->
+          if !parens - 1 < 0 then
+            raise (Invalid_statement("Mismatched ')'", i + !idx))
+          else
+            parens := !parens - 1
+        | "[" -> square_parens := !square_parens + 1
+        | "]" ->
+          if !square_parens - 1 < 0 then
+            raise (Invalid_statement("Mismatched ']'", i + !idx))
+          else
+            square_parens := !square_parens - 1
+        | "{" -> curly_parens := !curly_parens + 1
+        | "}" ->
+          if !curly_parens - 1 < 0 then
+            raise (Invalid_statement("Mismatched '}'", i + !idx))
+          else
+            curly_parens := !curly_parens - 1
+        | _ -> printf "Op: %s\n" op
+      end 
       | PString(s)   -> printf "String \"%s\"\n" s
       | Atom(a)      -> printf "Atom %s\n" a
-      | Keyword(_)   -> raise (Invalid_statement("Can't assgin a keyword to a variable", i))
-      | _            -> printf "" in
+      | Keyword(_)   -> raise (Invalid_statement("Can't assign a keyword to a variable", i))
+      | _            -> printf "" 
+      in
       idx := !idx + 1
     done
   with
