@@ -1,5 +1,6 @@
 open Tokenizer
 open Printf
+open Terminal
 
 exception Invalid_statement of string * int
 exception End
@@ -8,19 +9,21 @@ let stack_trace token_line e idx =
   let token = List.nth token_line.tokens idx in
   let col = token.col - 1 in
   print_endline "";
-  printf "%c[1m%c[33m%s:\nError on line %d col %d%c[0m\n" (Char.chr 0x001b)
-    (Char.chr 0x001b)  token_line.filename token.lineno token.col (Char.chr 0x001b);
+  print_style bold;
+  print_style yellow;
+  printf "%s:\nError on line %d col %d\n" token_line.filename token.lineno token.col;
+  print_style reset;
   printf "%s\n" token_line.line;
   for _ = 0 to col do
     printf " "
   done;
-  printf "%c[31;1m" (Char.chr 0x001b);
+  print_style bright_red;
   for _ = 1 to String.length token.s do
     printf "^"
   done;
-  printf "%c[33m " (Char.chr 0x001b);
-  print_endline e;
-  printf "%c[0m" (Char.chr 0x001b)
+  print_style magenta;
+  printf " %s\n" e;
+  print_style reset
 
 let rhs token_line i =
   let idx = ref 0 in

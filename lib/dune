@@ -1,2 +1,3 @@
 (library
-    (name rezit))
+    (name rezit)
+    (libraries terminal))
