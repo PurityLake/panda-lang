@@ -52,19 +52,19 @@ let rhs token_line i =
         | "(" -> parens := !parens + 1
         | ")" ->
           if !parens - 1 < 0 then
-            raise (Invalid_statement("Mismatched ')'", i + !idx))
+            raise (Invalid_statement("Unexpected token ')'", i + !idx))
           else
             parens := !parens - 1
         | "[" -> square_parens := !square_parens + 1
         | "]" ->
           if !square_parens - 1 < 0 then
-            raise (Invalid_statement("Mismatched ']'", i + !idx))
+            raise (Invalid_statement("Unexpected token ']'", i + !idx))
           else
             square_parens := !square_parens - 1
         | "{" -> curly_parens := !curly_parens + 1
         | "}" ->
           if !curly_parens - 1 < 0 then
-            raise (Invalid_statement("Mismatched '}'", i + !idx))
+            raise (Invalid_statement("Unexpected token '}'", i + !idx))
           else
             curly_parens := !curly_parens - 1
         | "=" -> 
