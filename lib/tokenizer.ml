@@ -3,7 +3,9 @@ type token_type =
 	| Keyword of string
 	| Operator of string
 	| Atom of string
-	| PString of string
+	| Integer of int
+	| FloatingPoint of float
+	| RString of string
 
 (* individual token *)
 type token = {
@@ -31,6 +33,14 @@ let operators = "+-/*^&|!;:@<>=()[]{}"
 let whitespace = " \t\r\n"
 (* keywords in rezit *)
 let keywords = ["let"; "func"; "class"; "return"]
+
+let is_int s = 
+	try ignore (int_of_string s); true
+	with _ -> false
+
+let is_float s =
+	try ignore (float_of_string s); true
+	with _ -> false
 
 (* recursive function to tokenize a string
 		buf: state passed to recursive calls
@@ -108,7 +118,12 @@ let rec __tokenize l s i lineno =
 						match List.find_opt (fun s -> s = ret) keywords with
 						| None ->
 							l@[{
-								ttype = Atom ret;
+								ttype = if is_int ret then
+										Integer (int_of_string ret)
+									else if is_float ret then
+										FloatingPoint (float_of_string ret)
+									else
+										Atom ret;
 								s = ret;
 								lineno = lineno;
 								col = i;

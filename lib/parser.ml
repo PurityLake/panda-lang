@@ -30,7 +30,7 @@ let stack_trace token_line e idx =
 
 (* rhs - right hand side - matches expression that occur on the right side
     of an equals sign*)
-let rec rhs token_line i =
+let rhs token_line i =
   let idx = ref 0 in
   let parens = ref 0 in
   let square_parens = ref 0 in
@@ -71,10 +71,12 @@ let rec rhs token_line i =
           raise (Invalid_statement("'=' is not a valid character in an rhs expresion", i + !idx))
         | _ -> printf "Op: %s\n" op
       end 
-      | PString(s)   -> printf "String \"%s\"\n" s
-      | Atom(a)      -> printf "Atom %s\n" a
-      | Keyword(k)   -> raise (Invalid_statement("Can't assign a keyword to a variable", i))
-      | _            -> printf "" 
+      | RString(s)       -> printf "String \"%s\"\n" s
+      | Atom(a)          -> printf "Atom %s\n" a
+      | Keyword(_)       -> raise (Invalid_statement("Can't assign a keyword to a variable", i))
+      | Integer(i)       -> printf "Integer %d\n" i
+      | FloatingPoint(f) -> printf "Float %f\n" f
+      | _                 -> printf "" 
       in
       idx := !idx + 1
     done
@@ -88,10 +90,12 @@ let let_statement token_line i =
     | Atom(name) ->
       printf "name = %s\n" name;
       name
-    | Keyword(name)  -> raise (Invalid_statement("'" ^ name ^ "' is a keyword and cannot be assigned to", i + 1))
-    | Operator(name) -> raise (Invalid_statement("'" ^ name ^ "' is an operator and cannot be assigned to", i + 1))
-    | PString(_)     -> raise (Invalid_statement("Cannot assigned to a string", i + 1))
-    | Start          -> raise (Invalid_statement("Start token is meant for beginning of list", i + 1))
+    | Keyword(name)    -> raise (Invalid_statement("'" ^ name ^ "' is a keyword and cannot be assigned to", i + 1))
+    | Operator(name)   -> raise (Invalid_statement("'" ^ name ^ "' is an operator and cannot be assigned to", i + 1))
+    | RString(_)       -> raise (Invalid_statement("Cannot assign to a string", i + 1))
+    | Start            -> raise (Invalid_statement("Start token is meant for beginning of list", i + 1))
+    | FloatingPoint(_) -> raise (Invalid_statement("Cannot assign to a float", i + 1))
+    | Integer(_)       -> raise (Invalid_statement("Cannot assign to an int", i + 1))
   in
   rhs token_line (i + 3);
   print_endline "valid let statement"
