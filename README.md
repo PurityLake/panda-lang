@@ -9,7 +9,7 @@ immutable i.e. there will be no methods that alter their state, returning a new 
 
 # Reference
 ## Assignment
-### Single Variable Assignment
+### Variable Assignment
 ```
 let x = 10;
 let y: int;
