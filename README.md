@@ -77,7 +77,7 @@ class Foo {
   let x: int;
   let y: int;
   
-  func constructor(x: int, y: int() {
+  constructor(x: int, y: int() {
     this.x = x;
     this.y = y;
   }
