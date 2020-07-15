@@ -12,7 +12,7 @@ immutable i.e. there will be no methods that alter their state, returning a new 
 ### Variable Assignment
 ```
 let x = 10;
-let y: int;
+let y: Int;
 ```
 Assignments use type inference to determine types in the case of an inline assignment like `line 1` where as if the value of a variable is not
 known upon definition then, a type is required as referred to in `line 2`.
@@ -25,7 +25,7 @@ let (c, _) = (10, 20);
 let (d, e) = t;
 let [f:g:rest] = [ 1, 2, 3, 4, 5 ]; # array literal
 ```
-In the case of this example, assignment is inferred. In `line 2`, `a` is assigned the value `10` and `b` is assigned the value `20`. For this assignment
+In the case of this example assignment is inferred. In `line 2`, `a` is assigned the value `10` and `b` is assigned the value `20`. For this assignment
 to take place then right hand side must have the same dimensions as the assignee of the left, in this case a 2-tuple. 
 
 `Line 3` shows that the underscore character is a wild card that will ignore whatever value it is passed. 
@@ -43,29 +43,59 @@ As each global variable is considered a part of a class, all `let` statements ar
 from changing interasl values. In Rezit it is recommened to create getter and setter methods to access internals of the file that need to be accessed
 as apposed to allowing users free reign of interals.
 
-## If Statement
-### Branching
+## Control Flow
+### if Statement
 ```
 let x = true;
 if x {
   Console.println("true");
+} else if 10 < 20 {
+  print("10 < 20");
 } else {
   Console.println("false");
 }
 ```
+If statements can be used as expected to allow branching paths depending on a boolean expression. If you are using an if statement to change flow of control,
+you must end every statement with a `;` character.
 
-### Return values
+### if Expression
 ```
-let y = if x {
+let y = if true {
   10
 } else {
   20
 }
 ```
+On the other hand and if can be treated as an expression returning the last non-semicolon terminated line. Tne result can be given to a variable or returned at
+the end of a function definition. 
+
+NOTE:
+The return value of the if expression must return the same type of result. The type of `y` must be known at compile time so both statements have to match type-wise.
+
+```
+# this is considered a compile time error
+let y = if true {
+  10
+} else {
+  "a string"
+}
+```
+
+The previous example is an illustration of what constitutes a compile time error in Rezit.
+
+### for loop
+```
+let arr = [1, 2, 3, 4, 5];
+for num in [1, 2, 3, 4, 5] {
+  print(num);
+}
+```
+A for loop in Rezit uses iterator objects to loop over collections of data like `arr`, iterators will be elaborated on in a different document. A let statement is not required
+in a foor loop as the variable is declared in a separate scope unique to the for loop.
 
 ## Function Declaration
 ```
-func add2(x: int, y: int) : int {
+func add2(x: Int, y: Int) : Int {
   Console.printf("%d + %d = %d\n", x, y, x + y);
   x + y
 }
@@ -74,15 +104,15 @@ func add2(x: int, y: int) : int {
 ## Class Declaration
 ```
 class Foo {
-  let x: int;
-  let y: int;
+  let x: Int;
+  let y: Int;
   
-  constructor(x: int, y: int() {
+  constructor(x: Int, y: Int() {
     this.x = x;
     this.y = y;
   }
   
-  private func pivateFunc() {
+  private func privateFunc() {
     # implementation
   }
   
